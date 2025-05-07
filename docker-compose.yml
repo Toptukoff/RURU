@@ -6,7 +6,7 @@ services:
     container_name: proxy
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "80:80"
     networks:
       - backend
 
