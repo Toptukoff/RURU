@@ -4,7 +4,7 @@
   become: true
 
   vars:
-    repo_url: "https://github.com/your-user/your-repo.git"  # ← замените
+    repo_url: "https://github.com/Toptukoff/RURU.git"  # ← замените
     project_dir: /opt/docker-app
     compose_bin: /usr/local/bin/docker-compose
 
