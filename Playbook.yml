@@ -1,0 +1,63 @@
+---
+- name: Install Docker & deploy project
+  hosts: all
+  become: true
+
+  vars:
+    repo_url: "https://github.com/your-user/your-repo.git"  # ← замените
+    project_dir: /opt/docker-app
+    compose_bin: /usr/local/bin/docker-compose
+
+  tasks:
+    - name: Install Docker, Compose, Git
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - git
+        state: present
+        update_cache: true
+
+    - name: Add GPG key and repo
+      apt_repository:
+        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable"
+        state: present
+        filename: docker
+      register: docker_repo_added
+    - name: Add GPG key
+      when: docker_repo_added is changed
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Install Docker CE
+      apt:
+        name: docker-ce
+        state: latest
+        update_cache: true
+
+    - name: Install Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/latest/download/docker-compose-linux-x86_64
+        dest: "{{ compose_bin }}"
+        mode: '0755'
+
+    - name: Start Docker
+      service:
+        name: docker
+        state: started
+        enabled: true
+
+    - name: Clone repo
+      git:
+        repo: "{{ repo_url }}"
+        dest: "{{ project_dir }}"
+        version: HEAD
+        force: yes
+
+    - name: Run docker-compose
+      command: docker-compose up -d
+      args:
+        chdir: "{{ project_dir }}"

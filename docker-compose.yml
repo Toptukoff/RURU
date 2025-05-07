@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  proxy:
+    build: ./proxy
+    container_name: proxy
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    networks:
+      - backend
+
+  app1:
+    build: ./web1
+    container_name: web1
+    networks:
+      - backend
+
+  app2:
+    build: ./web2
+    container_name: web2
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
